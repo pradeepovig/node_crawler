@@ -3,11 +3,11 @@ const cheerio = require('cheerio');
 let website = 'https://ianlunn.co.uk'; // Hard coded for now
 let keyword = 'Ian';
 let totalPagesCrawled = 0;
-let  pagesWithKeyword = 0;
+let pagesWithKeyword = 0;
 const urlHistory = [website]; // Dynamically growing crawled URL history
-const results = {};
-// let totalLinks= 0;
+const results = {}; // Store the output of a successful find in a neat format
 let linksStack= [];
+// let totalLinks= 0;
 
 /*Scope for dynamic user inputs later*/
 function takeInputFromUser() {
@@ -37,7 +37,7 @@ function printResults() {
     }
 }
 
-function getFullURLFromLink(link) {
+function getFullRelativeURLFromLink(link) {
     if (!link.includes('http')) { // Checking relative link only
         if (link.startsWith('/')) {
             return link === '/' ? '' : `${website}${link}`;
@@ -49,6 +49,10 @@ function getFullURLFromLink(link) {
     }
 }
 
+/*Spits out at least 1 word surrounding the searched keyword on
+either side from text.
+
+e.g Word1 {keyword} Word2*/
 function getNearbyWordsFromKeywordText(keyword, keywordText) {
     const regex = new RegExp(`(\\S+)\\s*${keyword}\\s*(\\S+)`, 'g');
     let m  = regex.exec(keywordText);
@@ -68,6 +72,12 @@ function findKeywordWithinBody(keyword, body = []) {
     return output;
 }
 
+/*TODO:
+*  1. Detect the end of recursive function and then print results.
+*  2. Debug the depth = 2 feature.
+*  3. Try out better libraries for crawling or rewrite with async await.
+*  4. Debug parsing HTML strings
+*/
 function crawl(url, keyword, depthCounter = 0) {
     rp(url)
         .then(res => {
@@ -88,7 +98,7 @@ function crawl(url, keyword, depthCounter = 0) {
 
             // Finding links and crawling over them recursively for depth upto 2
             const links = $('a').map((i, link) => link.attribs.href).get();
-            const relativeLinks = links.filter(link => !link.includes('http') && link !== '/').map(filteredLink => getFullURLFromLink(filteredLink));
+            const relativeLinks = links.filter(link => !link.includes('http') && link !== '/').map(filteredLink => getFullRelativeURLFromLink(filteredLink));
 
             linksStack = [...linksStack, ...relativeLinks];
 
