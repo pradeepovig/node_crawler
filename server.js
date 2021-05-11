@@ -4,7 +4,7 @@ let website = 'https://ianlunn.co.uk';
 let keyword = 'Ian';
 let totalPagesCrawled = 0;
 let  pagesWithKeyword = 0;
-const urlHistory = [];
+const urlHistory = [website];
 const results = {};
 let totalLinks= 0;
 let linksStack= [];
@@ -39,7 +39,7 @@ function printResults() {
 function getFullURLFromLink(link) {
     if (!link.includes('http')) { // Checking relative link only
         if (link.startsWith('/')) {
-            return `${website}${link}`;
+            return link === '/' ? '' : `${website}${link}`;
         } else {
             return `${website}/${link}`;
         }
@@ -87,7 +87,9 @@ function crawl(url, keyword, depthCounter = 0) {
 
             // Finding links and crawling over them recursively for depth upto 2
             const links = $('a').map((i, link) => link.attribs.href).get();
-            linksStack = linksStack.push(...links.filter(link => !link.includes('http')).map(filteredLink => getFullURLFromLink(filteredLink)));
+            const relativeLinks = links.filter(link => !link.includes('http') && link !== '/').map(filteredLink => getFullURLFromLink(filteredLink));
+
+            linksStack = [...linksStack, ...relativeLinks];
 
             if (linksStack.length && depthCounter <= 2) {
                 depthCounter++;
