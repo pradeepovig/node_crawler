@@ -1,14 +1,15 @@
 const rp = require('request-promise');
 const cheerio = require('cheerio');
-let website = 'https://ianlunn.co.uk';
+let website = 'https://ianlunn.co.uk'; // Hard coded for now
 let keyword = 'Ian';
 let totalPagesCrawled = 0;
 let  pagesWithKeyword = 0;
-const urlHistory = [website];
+const urlHistory = [website]; // Dynamically growing crawled URL history
 const results = {};
-let totalLinks= 0;
+// let totalLinks= 0;
 let linksStack= [];
 
+/*Scope for dynamic user inputs later*/
 function takeInputFromUser() {
     const readline = require('readline').createInterface({
         input: process.stdin,
